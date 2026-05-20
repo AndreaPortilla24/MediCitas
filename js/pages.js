@@ -1139,7 +1139,7 @@ function renderPlanes(){return `<div class="page"><div style="text-align:center;
     <p style="font-size:13px;color:var(--text2);margin:10px 0">${p.descripcion}</p>
     <div class="plan-features">${(p.features||[]).map(f=>`<div class="plan-feature">${ic('check',13)} ${f}</div>`).join('')}</div>
     <button class="btn btn-primary btn-lg btn-block" style="margin-top:16px" onclick="App.navigate('registro-consultorio')">${ic('plus',15)} Registrar mi consultorio</button>
-    <button class="btn btn-wa btn-sm btn-block" style="margin-top:8px" onclick="App.openWhatsApp('3209876543','Hola, quiero suscribir mi consultorio.')">${ic('wa',14)} Consultar por WhatsApp</button>
+    <button class="btn btn-wa btn-sm btn-block" style="margin-top:8px" onclick="App.openWhatsApp('3204924227','Hola, quiero suscribir mi consultorio.')">${ic('wa',14)} Consultar por WhatsApp</button>
   </div>`).join('')}</div>
 </div>`;}
 
@@ -1162,7 +1162,7 @@ function renderSobreNosotros(){return `<div class="page" style="max-width:880px"
 function renderContacto(){return `<div class="page" style="max-width:700px">
   <div class="section-header"><div><div class="section-title">Contáctanos</div><div class="section-sub">Estamos para ayudarte</div></div></div>
   <div class="grid-2" style="margin-bottom:20px">
-    <div class="card card-hover" onclick="App.openWhatsApp('3209876543','Hola, necesito información sobre MediCitas.')"><div class="card-body" style="text-align:center;padding:22px"><div style="color:#25D366;margin-bottom:8px">${ic('wa',34)}</div><div style="font-weight:700;margin-bottom:3px">WhatsApp</div><div style="font-size:13px;color:var(--text3)">+57 320 987 6543</div></div></div>
+    <div class="card card-hover" onclick="App.openWhatsApp('3204924227','Hola, necesito información sobre MediCitas.')"><div class="card-body" style="text-align:center;padding:22px"><div style="color:#25D366;margin-bottom:8px">${ic('wa',34)}</div><div style="font-weight:700;margin-bottom:3px">WhatsApp</div><div style="font-size:13px;color:var(--text3)">+57 320 492 4227</div></div></div>
     <div class="card"><div class="card-body" style="text-align:center;padding:22px"><div style="color:var(--primary);margin-bottom:8px">${ic('mail',34)}</div><div style="font-weight:700;margin-bottom:3px">Correo electrónico</div><div style="font-size:13px;color:var(--text3)">hola@medicitas.co</div></div></div>
   </div>
   <div class="card"><div class="card-body">
@@ -1179,7 +1179,7 @@ window.enviarContacto=function(btn){
   const n=document.getElementById('ct-nombre')?.value?.trim();const m=document.getElementById('ct-mensaje')?.value?.trim();
   if(!n||!m){App.showToast('Completa los campos obligatorios','error');return;}
   btnLoad(btn,true);
-  setTimeout(()=>{App.openWhatsApp('3209876543',`Hola MediCitas, soy ${n}.\n${m}`);btnLoad(btn,false);},400);
+  setTimeout(()=>{App.openWhatsApp('3204924227',`Hola MediCitas, soy ${n}.\n${m}`);btnLoad(btn,false);},400);
 };
 
 function renderModeloCanvas(){
