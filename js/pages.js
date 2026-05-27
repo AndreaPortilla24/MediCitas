@@ -1388,7 +1388,7 @@ function renderSobreNosotros(){return `<div class="page" style="max-width:880px"
   </div>
   <div class="section-header"><div class="section-title" style="font-size:17px">Nuestro equipo</div></div>
   <div class="team-grid">
-    ${[{n:'Ana García',r:'CEO & Fundadora',i:'AG'},{n:'Luis Pérez',r:'CTO',i:'LP'},{n:'Sandra Mora',r:'Diseño UX',i:'SM'},{n:'Carlos Ruiz',r:'Desarrollo',i:'CR'}].map(m=>`<div class="team-card"><div class="team-avatar">${m.i}</div><div style="font-weight:700;font-size:14px">${m.n}</div><div style="font-size:12px;color:var(--text3);margin-top:3px">${m.r}</div></div>`).join('')}
+    ${[{n:'Andrea Portilla',r:'CEO & Fundadora',i:'AP'},{n:'Fernando Montañez',r:'Desarrollo',i:'FM'}].map(m=>`<div class="team-card"><div class="team-avatar">${m.i}</div><div style="font-weight:700;font-size:14px">${m.n}</div><div style="font-size:12px;color:var(--text3);margin-top:3px">${m.r}</div></div>`).join('')}
   </div>
   <div style="text-align:center;margin-top:28px"><button class="btn btn-primary btn-lg" onclick="App.navigate('modelo-canvas')">${ic('grid',15)} Ver modelo Canvas</button></div>
 </div>`;}
