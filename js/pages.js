@@ -78,7 +78,7 @@ function renderHome() {
     <div class="card card-hover" onclick="filterByEsp('${e.nombre}')">
       <div class="card-body" style="text-align:center;padding:16px 10px">
         <div style="width:42px;height:42px;border-radius:11px;background:${e.color}18;display:flex;align-items:center;justify-content:center;margin:0 auto 9px;color:${e.color}">
-          ${DB.getEspIconoSVG(e.icono,30)}</div>
+          ${DB.getEspIconoSVG(e.icono,22)}</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:3px">${e.nombre}</div>
         <div style="font-size:11px;color:var(--text3)">${DB.consultorios.filter(c=>c.pagado&&c.especialidad_principal===e.nombre).length} consultorio(s)</div>
       </div>
@@ -87,10 +87,10 @@ function renderHome() {
   return `
     <div class="carousel" id="hero-carousel">
       <div class="carousel-track" id="carousel-track">
-        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Tu salud, nuestra prioridad en Bucaramanga</h2><p>Encuentra y agenda citas con los mejores especialistas médicos del área metropolitana.</p><button class="btn btn-accent btn-lg" onclick="App.navigate('directorio')">Explorar directorio</button></div></div></div>
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Tu salud, nuestra prioridad en Bucaramanga</h2><p>Encuentra y agenda citas con los mejores especialistas médicos del área metropolitana.</p><button class="btn btn-accent btn-lg" onclick="App.navigate('directorio')">Explorar directorio</button></div></div></div>
         <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Atención especializada para toda la familia</h2><p>Medicina general, pediatría, odontología y más de 12 especialidades disponibles.</p><button class="btn btn-accent btn-lg" onclick="App.navigate('directorio')">Ver especialidades</button></div></div></div>
-        <div class="carousel-slide"><img src= "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&q=80"alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Agenda en segundos, sin llamadas ni esperas</h2><p>Solicita tu cita en línea las 24 horas. Recibe confirmación directa del consultorio.</p><button class="btn btn-accent btn-lg" onclick="App.showModal('register')">Crear cuenta gratis</button></div></div></div>
-        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Salud mental, también es salud</h2><p>Psicólogos y especialistas en bienestar emocional con agenda en línea.</p><button class="btn btn-accent btn-lg" onclick="App.navigate('directorio')">Encontrar especialista</button></div></div></div>
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Agenda en segundos, sin llamadas ni esperas</h2><p>Solicita tu cita en línea las 24 horas. Recibe confirmación directa del consultorio.</p><button class="btn btn-accent btn-lg" onclick="App.showModal('register')">Crear cuenta gratis</button></div></div></div>
+        <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1400&q=80" alt=""><div class="carousel-overlay"><div class="carousel-caption"><h2>Salud mental, también es salud</h2><p>Psicólogos y especialistas en bienestar emocional con agenda en línea.</p><button class="btn btn-accent btn-lg" onclick="App.navigate('directorio')">Encontrar especialista</button></div></div></div>
       </div>
       <button class="carousel-arrow prev" onclick="carouselMove(-1)">${ic('arrow_l',22)}</button>
       <button class="carousel-arrow next" onclick="carouselMove(1)">${ic('arrow_r',22)}</button>
@@ -454,9 +454,45 @@ function renderDashConsultorio() {
     ${renderConsSidebar('perfil')}
     <div>
       <div class="section-header"><div><div class="section-title">Mi Consultorio</div><div class="section-sub">${cons.nombre_consultorio}</div></div>
-        ${cons.pagado?`<span class="badge badge-green">${ic('check',11)} Plan activo</span>`:`<span class="badge badge-orange">${ic('warn',11)} Sin plan</span>`}
+        ${cons.pagado
+          ? `<span class="badge badge-green">${ic('check',11)} Plan activo</span>`
+          : cons.validacion_estado==='aprobado'
+            ? `<span class="badge badge-blue">${ic('check',11)} Aprobado</span>`
+            : cons.validacion_estado==='rechazado'
+              ? `<span class="badge badge-red">${ic('x',11)} Tarjeta rechazada</span>`
+              : `<span class="badge badge-orange">${ic('clock',11)} En revisión</span>`
+        }
       </div>
-      ${!cons.pagado?`<div class="alert alert-warning"><div class="alert-icon">${ic('lock',15)}</div><div class="alert-body"><div class="alert-title">Consultorio no visible en el directorio</div>Activa tu plan para aparecer en búsquedas.<button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="App.navigate('pasarela-pago',{consId:'${cons.id_consultorio}'})">${ic('credit',13)} Activar plan</button></div></div>`:''}
+      ${cons.validacion_estado==='pendiente_revision'
+        ? `<div class="alert alert-warning">
+            <div class="alert-icon">${ic('clock',15)}</div>
+            <div class="alert-body">
+              <div class="alert-title">Cuenta en revisión</div>
+              El administrador está verificando tu tarjeta profesional. Mientras tanto, puedes completar tu perfil y subir imágenes. Una vez aprobado, se habilitará el pago.
+              <div style="margin-top:10px"><button class="btn btn-sm btn-outline" onclick="App.navigate('galeria')">${ic('upload',13)} Ver / subir tarjeta</button></div>
+            </div>
+          </div>`
+        : cons.validacion_estado==='rechazado'
+          ? `<div class="alert alert-error">
+              <div class="alert-icon">${ic('x',15)}</div>
+              <div class="alert-body">
+                <div class="alert-title">Tarjeta profesional rechazada</div>
+                <div style="margin-bottom:6px">${cons.motivo_rechazo||'Tu solicitud fue rechazada.'}</div>
+                <div style="font-size:13px;color:var(--text2)">Sube una nueva tarjeta para volver a solicitar revisión.</div>
+                <div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="App.navigate('galeria')">${ic('upload',13)} Subir nueva tarjeta</button></div>
+              </div>
+            </div>`
+          : cons.validacion_estado==='aprobado'&&!cons.pagado
+            ? `<div class="alert alert-info">
+                <div class="alert-icon">${ic('check',15)}</div>
+                <div class="alert-body">
+                  <div class="alert-title">¡Tarjeta verificada! Activa tu plan para aparecer en el directorio</div>
+                  Tu cuenta fue aprobada. Activa el plan MediCitas Pro para ser visible a los pacientes.
+                  <div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="App.navigate('pasarela-pago',{consId:'${cons.id_consultorio}'})">${ic('credit',13)} Activar plan — $90.000/mes</button></div>
+                </div>
+              </div>`
+            : ''
+      }
       ${pendientes.length>0?`<div class="alert alert-warning"><div class="alert-icon">${ic('bell',15)}</div><div class="alert-body"><div class="alert-title">${pendientes.length} solicitud(es) pendiente(s)</div><button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="App.navigate('bandeja')">Ir a bandeja</button></div></div>`:''}
       <div class="card" style="margin-bottom:14px"><div class="card-body">
         <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
@@ -514,7 +550,7 @@ function renderConsSidebar(active) {
     </button>`).join('')}
     <hr class="divider">
     ${cons?.pagado?`<button class="sidebar-item" onclick="App.navigate('detalle-consultorio',{id:'${cons?.id_consultorio||''}'})">${ic('eye',15)} Ver perfil público</button>`:''}
-    ${!cons?.pagado?`<button class="sidebar-item" style="color:var(--primary)" onclick="App.navigate('pasarela-pago',{consId:'${cons?.id_consultorio}'})">${ic('credit',15)} Activar plan</button>`:''}
+    ${cons?.validacion_estado==='aprobado'&&!cons?.pagado?`<button class="sidebar-item" style="color:var(--primary)" onclick="App.navigate('pasarela-pago',{consId:'${cons?.id_consultorio}'})">${ic('credit',15)} Activar plan</button>`:''}
   </div>`;
 }
 
@@ -772,10 +808,17 @@ function renderEstadisticas(){
 // ══════════════════════════════════════════════════════
 function renderGaleria(){
   const user=App.getUser();const cons=DB.consultorios.find(c=>c.id_consultorio===user?.id_consultorio)||DB.consultorios[0];
-  if(!cons.pagado) return renderPasarelaPago({consId:cons.id_consultorio,redirect:'galeria'});
   return `<div class="page"><div class="sidebar-layout">${renderConsSidebar('galeria')}
     <div>
       <div class="section-header"><div><div class="section-title">Galería e imágenes</div><div class="section-sub">Tarjeta profesional y galería del consultorio</div></div></div>
+      ${cons.validacion_estado==='pendiente_revision'
+        ? `<div class="alert alert-warning"><div class="alert-icon">${ic('clock',15)}</div><div class="alert-body"><div class="alert-title">Tarjeta en revisión</div>El administrador revisará tu tarjeta profesional. Puedes reemplazarla si cometiste un error.</div></div>`
+        : cons.validacion_estado==='rechazado'
+          ? `<div class="alert alert-error"><div class="alert-icon">${ic('x',15)}</div><div class="alert-body"><div class="alert-title">Tarjeta rechazada — sube una nueva</div>${cons.motivo_rechazo||'La tarjeta fue rechazada.'}. Sube una versión corregida.</div></div>`
+          : cons.validacion_estado==='aprobado'
+            ? `<div class="alert" style="background:#f0fff8;border:1px solid #6ee7b7;color:#065f46"><div class="alert-icon">${ic('check',15)}</div><div class="alert-body"><div class="alert-title">Tarjeta verificada ✓</div>${!cons.pagado?'Activa tu plan para aparecer en el directorio.':'Tu consultorio está activo y visible.'}</div></div>`
+            : ''
+      }
       <!-- Tarjeta profesional -->
       <div class="card" style="margin-bottom:14px">
         <div class="table-title">Tarjeta profesional</div>
@@ -786,11 +829,13 @@ function renderGaleria(){
               <div>
                 <div style="font-weight:600;font-size:13px;margin-bottom:4px">${ic('check',14)} Tarjeta cargada</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  ${cons.validacion_estado!=='aprobado'?`
                   <label class="btn btn-outline btn-sm" style="cursor:pointer">
                     ${ic('upload',13)} Reemplazar
                     <input type="file" accept="image/*" style="display:none" onchange="previewTarjeta('${cons.id_consultorio}',this)">
                   </label>
                   <button class="btn btn-danger btn-sm" onclick="eliminarTarjeta('${cons.id_consultorio}')">${ic('trash',12)} Eliminar</button>
+                  `:''}
                 </div>
               </div>
             </div>`:`
@@ -841,7 +886,13 @@ window.previewTarjeta=function(consId,input){
   reader.onload=function(e){
     const c=DB.getConsultorioById(consId);
     c.tarjeta_profesional=e.target.result;
-    App.showToast('Tarjeta cargada correctamente','success');
+    if(c.validacion_estado==='rechazado') {
+      c.validacion_estado='pendiente_revision';
+      c.motivo_rechazo=null;
+      App.showToast('Nueva tarjeta enviada. El administrador la revisará nuevamente.','success');
+    } else {
+      App.showToast('Tarjeta cargada. El administrador la revisará pronto.','success');
+    }
     App.navigate('galeria');
   };
   reader.readAsDataURL(file);
@@ -877,6 +928,22 @@ window.eliminarFotoGaleria=function(consId,idx){
 // ══════════════════════════════════════════════════════
 function renderPasarelaPago(params={}){
   const consId=params.consId;const cons=DB.getConsultorioById(consId)||DB.consultorios[0];
+  if(cons && cons.validacion_estado!=='aprobado') {
+    const isRejected = cons.validacion_estado==='rechazado';
+    const msg = isRejected
+      ? 'Tu tarjeta profesional fue rechazada. Sube una nueva versión para que el administrador la revise.'
+      : 'El pago se habilitará una vez que el administrador apruebe tu tarjeta profesional.';
+    return `<div class="page" style="max-width:540px">
+      <div class="section-header"><div class="section-title">Activar plan</div></div>
+      <div class="card"><div class="card-body" style="text-align:center;padding:40px 24px">
+        <div style="font-size:48px;margin-bottom:16px">${isRejected?'❌':'⏳'}</div>
+        <div style="font-weight:700;font-size:17px;margin-bottom:10px">${isRejected?'Tarjeta rechazada':'Verificación pendiente'}</div>
+        <div style="font-size:15px;color:var(--text2);margin-bottom:24px">${msg}</div>
+        <button class="btn btn-primary" onclick="App.navigate('galeria')">${ic('upload',15)} ${isRejected?'Subir nueva tarjeta':'Ver mi tarjeta profesional'}</button>
+      </div></div>
+    </div>`;
+  }
+
   return `<div class="page" style="max-width:540px">
     <div class="section-header"><div class="section-title">Activar plan MediCitas Pro</div></div>
     <div class="pasarela-card">
@@ -911,7 +978,7 @@ function renderRegistroConsultorio(){
   return `<div class="page" style="max-width:660px">
     <div class="section-header"><div><div class="section-title">Registrar mi consultorio</div><div class="section-sub">Crea tu perfil y activa tu visibilidad</div></div></div>
     <div class="card"><div class="card-body">
-      <div class="alert alert-info"><div class="alert-icon">${ic('info',15)}</div><div class="alert-body">Después del registro podrás activar el plan MediCitas Pro ($90.000/mes) para aparecer en el directorio.</div></div>
+      <div class="alert alert-info"><div class="alert-icon">${ic('info',15)}</div><div class="alert-body">Completa tu registro, sube tu tarjeta profesional y espera la verificación del administrador. Una vez aprobado, podrás activar tu plan y aparecer en el directorio.</div></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nombre del profesional <span class="req">*</span></label><input class="form-control" id="rc-nombre-prof" placeholder="Dr. Nombre Apellido"></div>
         <div class="form-group"><label class="form-label">Nombre del consultorio <span class="req">*</span></label><input class="form-control" id="rc-nombre-cons" placeholder="Consultorio Médico..."></div>
@@ -954,9 +1021,173 @@ window.registrarConsultorio=function(btn){
     const cons=DB.addConsultorio({nombre_profesional:np,nombre_consultorio:nc,especialidad_principal:esp,especialidad_id:espObj?.id||1,municipio:document.getElementById('rc-municipio')?.value||'Bucaramanga',barrio:document.getElementById('rc-barrio')?.value?.trim()||'',direccion:document.getElementById('rc-dir')?.value?.trim()||'',telefono_contacto:tel,whatsapp:tel,email,horario_resumen:'Lun-Vie 8am-6pm',precio_min:50000,precio_max:100000,descripcion:'',foto_url:'',lat:7.1193,lng:-73.1227,calificacion:0,resenas:0});
     DB.addUser({nombre:np,email,password:pass,rol:'consultorio',telefono:tel,avatar:np.split(' ').filter(w=>w).map(w=>w[0]).join('').slice(0,2).toUpperCase(),id_consultorio:cons.id_consultorio});
     App.login(email,pass);
-    App.showToast(`Bienvenido, ${np.split(' ')[0]}!`,'success');
-    App.navigate('pasarela-pago',{consId:cons.id_consultorio});
+    App.showToast(`¡Bienvenido, ${np.split(' ')[0]}! Ahora sube tu tarjeta profesional.`,'success');
+    App.navigate('galeria');
   },600);
+};
+
+
+// ══════════════════════════════════════════════════════
+// ADMIN – BANDEJA DE VALIDACIÓN DE TARJETAS PROFESIONALES
+// ══════════════════════════════════════════════════════
+function initBadgeValidaciones(){
+  const pending = DB.consultorios.filter(c=>c.validacion_estado==='pendiente_revision').length;
+  const badge = document.getElementById('badge-validaciones');
+  if(badge){ badge.textContent = pending > 0 ? pending : ''; badge.style.display = pending > 0 ? '' : 'none'; }
+}
+
+function renderValidacionEstado(c){
+  if(c.validacion_estado==='aprobado') return `<span class="badge badge-green">${ic('check',11)} Aprobado</span>`;
+  if(c.validacion_estado==='rechazado') return `<span class="badge badge-red">${ic('x',11)} Rechazado</span>`;
+  return `<span class="badge badge-orange">${ic('clock',11)} Pendiente revisión</span>`;
+}
+
+function renderAdminValidaciones(){
+  const pendientes = DB.consultorios.filter(c=>c.validacion_estado==='pendiente_revision');
+  const rechazados = DB.consultorios.filter(c=>c.validacion_estado==='rechazado');
+  const aprobados  = DB.consultorios.filter(c=>c.validacion_estado==='aprobado');
+
+  return `<div>
+  <div class="section-header">
+    <div>
+      <div class="section-title" style="font-size:16px">Bandeja de Validaciones</div>
+      <div class="section-sub">Verifica la tarjeta profesional antes de activar cada consultorio</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <span class="badge badge-orange" style="font-size:12px;padding:5px 10px">${pendientes.length} pendiente${pendientes.length!==1?'s':''}</span>
+      <span class="badge badge-red"    style="font-size:12px;padding:5px 10px">${rechazados.length} rechazado${rechazados.length!==1?'s':''}</span>
+      <span class="badge badge-green"  style="font-size:12px;padding:5px 10px">${aprobados.length} aprobado${aprobados.length!==1?'s':''}</span>
+    </div>
+  </div>
+
+  <!-- PENDIENTES -->
+  ${pendientes.length===0
+    ? `<div class="card" style="margin-bottom:20px"><div class="card-body"><div class="empty-state" style="padding:24px 0"><div class="empty-icon">${ic('check',40)}</div><div class="empty-title">¡Sin solicitudes pendientes!</div><div class="empty-sub">Todos los consultorios han sido revisados.</div></div></div></div>`
+    : `<div class="card" style="margin-bottom:20px">
+        <div class="card-body">
+          <div style="font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">${ic('clock',15)} <span>Pendientes de revisión</span></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            ${pendientes.map(c=>renderValidacionCard(c,'pendiente')).join('')}
+          </div>
+        </div>
+      </div>`
+  }
+
+  <!-- RECHAZADOS -->
+  ${rechazados.length>0?`<div class="card" style="margin-bottom:20px">
+    <div class="card-body">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--danger)">${ic('x',15)} <span>Rechazados</span></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${rechazados.map(c=>renderValidacionCard(c,'rechazado')).join('')}
+      </div>
+    </div>
+  </div>`:''}
+
+  <!-- APROBADOS -->
+  <div class="card">
+    <div class="card-body">
+      <div style="font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--success)">${ic('check',15)} <span>Aprobados (${aprobados.length})</span></div>
+      ${aprobados.length===0
+        ? `<div style="font-size:13px;color:var(--text3)">Ninguno aprobado aún.</div>`
+        : `<div class="table-wrap"><table class="data-table"><thead><tr><th>Profesional</th><th>Consultorio</th><th>Especialidad</th><th>Registro</th><th>Plan</th></tr></thead><tbody>
+          ${aprobados.map(c=>`<tr>
+            <td><strong>${c.nombre_profesional}</strong></td>
+            <td style="font-size:13px">${c.nombre_consultorio}</td>
+            <td style="font-size:13px">${c.especialidad_principal}</td>
+            <td style="font-size:12px;color:var(--text3)">${DB.formatFecha(c.fecha_registro)}</td>
+            <td>${c.pagado?`<span class="badge badge-green">${ic('check',11)} Activo</span>`:`<span class="badge badge-gray">Sin plan</span>`}</td>
+          </tr>`).join('')}
+          </tbody></table></div>`
+      }
+    </div>
+  </div>
+
+  <!-- Modal rechazo -->
+  <div id="modal-rechazo-val" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+    <div class="modal-box" style="max-width:440px;width:95%;background:var(--surface);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow-lg)">
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px">${ic('x',16)} Rechazar solicitud</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:16px">Indica el motivo del rechazo. El consultorio podrá corregir y reenviar.</div>
+      <input type="hidden" id="rechazo-cons-id">
+      <textarea id="rechazo-motivo" rows="3" placeholder="Ej: Tarjeta profesional ilegible, número no coincide con la base de datos..." style="width:100%;padding:10px 12px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;resize:vertical;background:var(--bg);color:var(--text1);box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('modal-rechazo-val').style.display='none'">Cancelar</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmarRechazoVal()">${ic('x',13)} Confirmar rechazo</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function renderValidacionCard(c, tipo){
+  const hasTarjeta = !!c.tarjeta_profesional;
+  return `<div style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--bg)">
+    <div style="display:flex;gap:16px;align-items:flex-start">
+      <!-- Avatar -->
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0">${c.iniciales}</div>
+      <!-- Info -->
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${c.nombre_profesional}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${c.nombre_consultorio} · ${c.especialidad_principal} · ${c.municipio}</div>
+        <div style="font-size:12px;color:var(--text3)">Registrado: ${DB.formatFecha(c.fecha_registro)} · ${c.email}</div>
+        ${tipo==='rechazado'&&c.motivo_rechazo?`<div style="margin-top:6px;font-size:12px;color:var(--danger);background:var(--danger-bg,#fef2f2);padding:6px 10px;border-radius:var(--radius)">${ic('x',12)} <strong>Motivo:</strong> ${c.motivo_rechazo}</div>`:''}
+      </div>
+      <!-- Status badge -->
+      <div>${renderValidacionEstado(c)}</div>
+    </div>
+
+    <!-- Tarjeta profesional -->
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">${ic('shield',13)} Tarjeta Profesional adjunta</div>
+      ${hasTarjeta
+        ? `<div style="display:flex;align-items:center;gap:12px">
+            <img src="${c.tarjeta_profesional}" onclick="window.open('${c.tarjeta_profesional}','_blank')" style="height:100px;max-width:180px;border-radius:8px;border:1px solid var(--border);object-fit:cover;cursor:pointer" title="Clic para ampliar" alt="Tarjeta profesional">
+            <div style="font-size:12px;color:var(--text3)">${ic('info',12)} Haz clic en la imagen para ampliarla</div>
+          </div>`
+        : `<div style="font-size:12px;color:var(--warning,#f59e0b);background:#fffbeb;padding:8px 12px;border-radius:var(--radius)">${ic('warn',13)} El consultorio aún no ha subido su tarjeta profesional.</div>`
+      }
+    </div>
+
+    <!-- Actions -->
+    ${tipo==='pendiente'
+      ? `<div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-success btn-sm" onclick="aprobarConsultorioAdmin('${c.id_consultorio}',this)">${ic('check',13)} Aprobar y activar</button>
+          <button class="btn btn-danger btn-sm" onclick="abrirModalRechazo('${c.id_consultorio}')">${ic('x',13)} Rechazar</button>
+        </div>`
+      : tipo==='rechazado'
+        ? `<div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-success btn-sm" onclick="aprobarConsultorioAdmin('${c.id_consultorio}',this)">${ic('check',13)} Aprobar igualmente</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirModalRechazo('${c.id_consultorio}')">${ic('edit',13)} Editar motivo</button>
+          </div>`
+        : ''
+    }
+  </div>`;
+}
+
+window.aprobarConsultorioAdmin = function(id, btn){
+  btnLoad(btn, true);
+  setTimeout(()=>{
+    DB.validarConsultorio(id);
+    initBadgeValidaciones();
+    adminTab('validaciones');
+    App.showToast('Consultorio aprobado y activado','success');
+  }, 600);
+};
+
+window.abrirModalRechazo = function(id){
+  document.getElementById('rechazo-cons-id').value = id;
+  document.getElementById('rechazo-motivo').value = '';
+  document.getElementById('modal-rechazo-val').style.display = 'flex';
+};
+
+window.confirmarRechazoVal = function(){
+  const id = document.getElementById('rechazo-cons-id').value;
+  const motivo = document.getElementById('rechazo-motivo').value.trim();
+  if(!motivo){ App.showToast('Escribe el motivo del rechazo','error'); return; }
+  DB.rechazarConsultorio(id, motivo);
+  document.getElementById('modal-rechazo-val').style.display = 'none';
+  initBadgeValidaciones();
+  adminTab('validaciones');
+  App.showToast('Solicitud rechazada','info');
 };
 
 // ══════════════════════════════════════════════════════
@@ -974,6 +1205,7 @@ function renderAdmin(){
         <button class="sidebar-item" id="adm-btn-pagos" onclick="adminTab('pagos')">${ic('credit',16)} Pagos</button>
         <button class="sidebar-item" id="adm-btn-tags" onclick="adminTab('tags')">${ic('tag',16)} Etiquetas</button>
         <button class="sidebar-item" id="adm-btn-especialidades" onclick="adminTab('especialidades')">${ic('grid',16)} Especialidades</button>
+        <button class="sidebar-item" id="adm-btn-validaciones" onclick="adminTab('validaciones')">${ic('shield',16)} Validaciones<span id="badge-validaciones" class="badge badge-red" style="margin-left:auto;font-size:10px;padding:2px 6px"></span></button>
         <hr class="divider">
         <button class="sidebar-item" onclick="App.navigate('home')">${ic('arrow_l',15)} Volver al sitio</button>
       </div>
@@ -981,7 +1213,7 @@ function renderAdmin(){
     </div>
   </div>`;
 }
-function initAdmin(){ adminTab('dashboard'); }
+function initAdmin(){ adminTab('validaciones'); initBadgeValidaciones(); }
 window.adminTab=function(tab){
   document.querySelectorAll('[id^="adm-btn-"]').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById(`adm-btn-${tab}`);if(btn)btn.classList.add('active');
@@ -994,6 +1226,7 @@ window.adminTab=function(tab){
     case 'pagos':         el.innerHTML=renderAdminPagos();      break;
     case 'tags':          el.innerHTML=renderAdminTags();       break;
     case 'especialidades':el.innerHTML=renderAdminEsp();        break;
+    case 'validaciones':  el.innerHTML=renderAdminValidaciones(); initBadgeValidaciones(); break;
   }
 };
 
@@ -1003,6 +1236,7 @@ function renderAdminDashboard(){return `<div>
     <div class="stat-card"><div class="stat-icon blue">${ic('stethoscope',20)}</div><div><div class="stat-val">${DB.consultorios.length}</div><div class="stat-lbl">Consultorios</div></div></div>
     <div class="stat-card"><div class="stat-icon green">${ic('check',20)}</div><div><div class="stat-val">${DB.consultorios.filter(c=>c.pagado).length}</div><div class="stat-lbl">Con plan activo</div></div></div>
     <div class="stat-card"><div class="stat-icon orange">${ic('list',20)}</div><div><div class="stat-val">${DB.citas.length}</div><div class="stat-lbl">Citas totales</div></div></div>
+    <div class="stat-card"><div class="stat-icon orange">${ic('clock',20)}</div><div><div class="stat-val">${DB.consultorios.filter(c=>c.validacion_estado==='pendiente_revision').length}</div><div class="stat-lbl">Pendientes validación</div></div></div>
     <div class="stat-card"><div class="stat-icon red">${ic('credit',20)}</div><div><div class="stat-val">${DB.formatPrecio(DB.consultorios.filter(c=>c.pagado).length*90000)}</div><div class="stat-lbl">MRR</div></div></div>
   </div>
   <div class="card"><div class="card-body"><div style="font-weight:700;margin-bottom:12px">Resumen</div>
@@ -1139,7 +1373,7 @@ function renderPlanes(){return `<div class="page"><div style="text-align:center;
     <p style="font-size:13px;color:var(--text2);margin:10px 0">${p.descripcion}</p>
     <div class="plan-features">${(p.features||[]).map(f=>`<div class="plan-feature">${ic('check',13)} ${f}</div>`).join('')}</div>
     <button class="btn btn-primary btn-lg btn-block" style="margin-top:16px" onclick="App.navigate('registro-consultorio')">${ic('plus',15)} Registrar mi consultorio</button>
-    <button class="btn btn-wa btn-sm btn-block" style="margin-top:8px" onclick="App.openWhatsApp('3204924227','Hola, quiero suscribir mi consultorio.')">${ic('wa',14)} Consultar por WhatsApp</button>
+    <button class="btn btn-wa btn-sm btn-block" style="margin-top:8px" onclick="App.openWhatsApp('3209876543','Hola, quiero suscribir mi consultorio.')">${ic('wa',14)} Consultar por WhatsApp</button>
   </div>`).join('')}</div>
 </div>`;}
 
@@ -1154,7 +1388,7 @@ function renderSobreNosotros(){return `<div class="page" style="max-width:880px"
   </div>
   <div class="section-header"><div class="section-title" style="font-size:17px">Nuestro equipo</div></div>
   <div class="team-grid">
-    ${[{n:'Andrea Portilla',r:'CEO & Fundadora',i:'AP'},{n:'Fernando Montañez',r:'Desarrollo',i:'FM'}].map(m=>`<div class="team-card"><div class="team-avatar">${m.i}</div><div style="font-weight:700;font-size:14px">${m.n}</div><div style="font-size:12px;color:var(--text3);margin-top:3px">${m.r}</div></div>`).join('')}
+    ${[{n:'Ana García',r:'CEO & Fundadora',i:'AG'},{n:'Luis Pérez',r:'CTO',i:'LP'},{n:'Sandra Mora',r:'Diseño UX',i:'SM'},{n:'Carlos Ruiz',r:'Desarrollo',i:'CR'}].map(m=>`<div class="team-card"><div class="team-avatar">${m.i}</div><div style="font-weight:700;font-size:14px">${m.n}</div><div style="font-size:12px;color:var(--text3);margin-top:3px">${m.r}</div></div>`).join('')}
   </div>
   <div style="text-align:center;margin-top:28px"><button class="btn btn-primary btn-lg" onclick="App.navigate('modelo-canvas')">${ic('grid',15)} Ver modelo Canvas</button></div>
 </div>`;}
@@ -1162,7 +1396,7 @@ function renderSobreNosotros(){return `<div class="page" style="max-width:880px"
 function renderContacto(){return `<div class="page" style="max-width:700px">
   <div class="section-header"><div><div class="section-title">Contáctanos</div><div class="section-sub">Estamos para ayudarte</div></div></div>
   <div class="grid-2" style="margin-bottom:20px">
-    <div class="card card-hover" onclick="App.openWhatsApp('3204924227','Hola, necesito información sobre MediCitas.')"><div class="card-body" style="text-align:center;padding:22px"><div style="color:#25D366;margin-bottom:8px">${ic('wa',34)}</div><div style="font-weight:700;margin-bottom:3px">WhatsApp</div><div style="font-size:13px;color:var(--text3)">+57 320 492 4227</div></div></div>
+    <div class="card card-hover" onclick="App.openWhatsApp('3209876543','Hola, necesito información sobre MediCitas.')"><div class="card-body" style="text-align:center;padding:22px"><div style="color:#25D366;margin-bottom:8px">${ic('wa',34)}</div><div style="font-weight:700;margin-bottom:3px">WhatsApp</div><div style="font-size:13px;color:var(--text3)">+57 320 987 6543</div></div></div>
     <div class="card"><div class="card-body" style="text-align:center;padding:22px"><div style="color:var(--primary);margin-bottom:8px">${ic('mail',34)}</div><div style="font-weight:700;margin-bottom:3px">Correo electrónico</div><div style="font-size:13px;color:var(--text3)">hola@medicitas.co</div></div></div>
   </div>
   <div class="card"><div class="card-body">
@@ -1179,7 +1413,7 @@ window.enviarContacto=function(btn){
   const n=document.getElementById('ct-nombre')?.value?.trim();const m=document.getElementById('ct-mensaje')?.value?.trim();
   if(!n||!m){App.showToast('Completa los campos obligatorios','error');return;}
   btnLoad(btn,true);
-  setTimeout(()=>{App.openWhatsApp('3204924227',`Hola MediCitas, soy ${n}.\n${m}`);btnLoad(btn,false);},400);
+  setTimeout(()=>{App.openWhatsApp('3209876543',`Hola MediCitas, soy ${n}.\n${m}`);btnLoad(btn,false);},400);
 };
 
 function renderModeloCanvas(){

@@ -122,14 +122,33 @@ const App = (() => {
   let _historyIgnore = false;
 
   // ── AUTH ────────────────────────────────────────────
+  const SESSION_KEY = 'medicitas_session';
+
+  function _saveSession(user) {
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify({ email: user.email })); } catch(e) {}
+  }
+  function _clearSession() {
+    try { localStorage.removeItem(SESSION_KEY); } catch(e) {}
+  }
+  function _restoreSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return;
+      const { email } = JSON.parse(raw);
+      const user = (DB.usuarios || []).find(u => u.email === email && u.activo);
+      if (user) { currentUser = user; }
+    } catch(e) {}
+  }
+
   function login(email, password) {
     const user = DB.authenticate(email, password);
     if (!user) return null;
     currentUser = user;
+    _saveSession(user);
     renderNav();
     return user;
   }
-  function logout() { currentUser = null; navigate('home'); renderNav(); showToast('Sesión cerrada', 'info'); }
+  function logout() { currentUser = null; _clearSession(); navigate('home'); renderNav(); showToast('Sesión cerrada', 'info'); }
   function getUser() { return currentUser; }
   function isLoggedIn() { return !!currentUser; }
   function hasRole(r) { return currentUser && currentUser.rol === r; }
@@ -291,6 +310,9 @@ const App = (() => {
   window.showModal  = showModal;
   window.closeModal = closeModal;
   window.closeModalById = id => { const el=document.getElementById(id); if(el) el.style.display='none'; };
+
+  // Restore session on load (before any navigation happens)
+  _restoreSession();
 
   return { navigate, login, logout, getUser, isLoggedIn, hasRole,
            showToast, showModal, closeModal, openWhatsApp, sendWhatsAppCita,
