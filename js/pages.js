@@ -78,7 +78,7 @@ function renderHome() {
     <div class="card card-hover" onclick="filterByEsp('${e.nombre}')">
       <div class="card-body" style="text-align:center;padding:16px 10px">
         <div style="width:42px;height:42px;border-radius:11px;background:${e.color}18;display:flex;align-items:center;justify-content:center;margin:0 auto 9px;color:${e.color}">
-          ${DB.getEspIconoSVG(e.icono,22)}</div>
+          ${DB.getEspIconoSVG(e.icono,30)}</div>
         <div style="font-weight:700;font-size:13px;margin-bottom:3px">${e.nombre}</div>
         <div style="font-size:11px;color:var(--text3)">${DB.consultorios.filter(c=>c.pagado&&c.especialidad_principal===e.nombre).length} consultorio(s)</div>
       </div>
